@@ -1,0 +1,30 @@
+{% extends 'tasks/base.html' %}
+
+{% block content %}
+<div class="fade-in">
+    <h2>Edit task</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <label>Title</label>
+        {{ form.title }}
+
+        <label>Description</label>
+        {{ form.description }}
+
+        <label>Deadline</label>
+        {{ form.deadline }}
+
+        <label>Assign to</label>
+        {{ form.assigned_to }}
+
+        <label>Priority</label>
+        {{ form.priority }}
+
+        <label>Status</label>
+        {{ form.status }}
+
+        <button type="submit">Save</button>
+    </form>
+</div>>
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends 'tasks/base.html' %}
+
+{% block content %}
+<h2>Task Completion Statistics</h2>
+
+<h3>Tasks by Users</h3>
+<canvas id="tasksByUserChart"></canvas>
+
+<h3>Tasks by Date</h3>
+<canvas id="tasksByDateChart"></canvas>
+
+<script>
+    // Graph for tasks by user
+    var ctx1 = document.getElementById('tasksByUserChart').getContext('2d');
+    var tasksByUserChart = new Chart(ctx1, {
+        type: 'bar',
+        data: {
+            labels: [{% for item in task_counts %}'{{ item.assigned_to }}'{% if not forloop.last %},{% endif %}{% endfor %}],
+            datasets: [{
+                label: 'Completed Tasks by User',
+                data: [{% for item in task_counts %}{{ item.task_count }}{% if not forloop.last %},{% endif %}{% endfor %}],
+                backgroundColor: '#28a745',
+                borderColor: '#28a745',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Graph for tasks by date
+    var ctx2 = document.getElementById('tasksByDateChart').getContext('2d');
+    var tasksByDateChart = new Chart(ctx2, {
+        type: 'line',
+        data: {
+            labels: [{% for item in task_dates %}'{{ item.day }}'{% if not forloop.last %},{% endif %}{% endfor %}],
+            datasets: [{
+                label: 'Completed Tasks by Date',
+                data: [{% for item in task_dates %}{{ item.task_count }}{% if not forloop.last %},{% endif %}{% endfor %}],
+                backgroundColor: '#007bff',
+                borderColor: '#007bff',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+<div class="report-buttons">
+    <a href="{% url 'export_task_report' %}" class="btn btn-download">Download Task Report (CSV)</a>
+    <a href="{% url 'export_task_report_pdf' %}" class="btn btn-download">Download Task Report (PDF)</a>
+</div>
+{% endblock %}
+

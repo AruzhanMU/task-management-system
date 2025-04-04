@@ -1,0 +1,66 @@
+{% extends 'tasks/base.html' %}
+
+{% block content %}
+<h2>My Tasks</h2>
+
+<div class="stats">
+    <div class="card">
+        <h4>Total</h4>
+        <p>{{ total }}</p>
+    </div>
+    <div class="card">
+        <h4>New</h4>
+        <p>{{ new }}</p>
+    </div>
+    <div class="card">
+        <h4>In Progress</h4>
+        <p>{{ in_progress }}</p>
+    </div>
+    <div class="card">
+        <h4>Done</h4>
+        <p>{{ done }}</p>
+    </div>
+</div>
+
+<form method="get">
+    <label for="status">Filter by status:</label>
+    <select name="status" id="status" onchange="this.form.submit()">
+        <option value="">All</option>
+        <option value="new" {% if request.GET.status == 'new' %}selected{% endif %}>New</option>
+        <option value="in_progress" {% if request.GET.status == 'in_progress' %}selected{% endif %}>In Progress</option>
+        <option value="done" {% if request.GET.status == 'done' %}selected{% endif %}>Done</option>
+    </select>
+</form>
+
+{% if tasks %}
+    <div class="task-list">
+        {% for task in tasks %}
+        <div class="task-card fade-in">
+            <div class="task-header">
+                <h3>{{ task.title }}</h3>
+                <span class="status status-{{ task.status }}">{{ task.get_status_display }}</span>
+            </div>
+            <p>{{ task.description|truncatewords:15 }}</p>
+            <p><strong>Priority:</strong> <span class="priority priority-{{ task.priority }}">{{ task.get_priority_display }}</span></p>
+            <p><strong>Due:</strong> {{ task.deadline|date:"d M Y H:i" }}</p>
+            {% if task.reminder_sent %}
+                <span class="reminder-label">Reminder sent</span>
+            {% endif %}
+            <p><strong>Assigned to:</strong> {{ task.assigned_to.username }}</p>
+
+            <div class="task-actions">
+                <a href="{% url 'task_detail' task.pk %}">View</a>
+                {% if user == task.created_by or user.role == 'admin' %}
+                    | <a href="{% url 'task_edit' task.pk %}">Edit</a>
+                    | <a href="{% url 'task_delete' task.pk %}">Delete</a>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <p>No tasks found.</p>
+        {% endfor %}
+    </div>
+{% else %}
+    <p>No tasks found.</p>
+{% endif %}
+{% endblock %}

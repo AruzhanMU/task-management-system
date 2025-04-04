@@ -1,0 +1,64 @@
+{% extends 'tasks/base.html' %}
+
+{% block content %}
+<div class="task-card fade-in">
+    <div class="task-header">
+        <h2>{{ task.title }}</h2>
+        <span class="status status-{{ task.status }}">{{ task.get_status_display }}</span>
+    </div>
+
+    <p><strong>Description:</strong><br>{{ task.description }}</p>
+    <p><strong>Priority:</strong>
+        <span class="priority priority-{{ task.priority }}">{{ task.get_priority_display }}</span>
+    </p>
+    <p><strong>Due:</strong> {{ task.deadline|date:"d M Y H:i" }}</p>
+    {% if task.reminder_sent %}
+        <p><strong>Status:</strong> <span class="reminder-label">Reminder sent</span></p>
+    {% endif %}
+    <p><strong>Assigned to:</strong> {{ task.assigned_to.username }}</p>
+    <p><strong>Created by:</strong> {{ task.created_by.username }}</p>
+    {% if task.attachment %}
+        <p><strong>Attachment:</strong>
+            <a href="{{ task.attachment.url }}" target="_blank" class="btn-download"> Download file</a>
+        </p>
+    {% endif %}
+    <hr>
+
+    <div class="comment-section">
+        <h4>Comments</h4>
+        {% if comments %}
+            <ul class="comment-list">
+                {% for comment in comments %}
+                    <li>
+                        <span class="comment-meta">{{ comment.created_at|date:"d M Y H:i" }} — <strong>{{ comment.author.username }}</strong></span><br>
+                        {{ comment.text }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No comments yet.</p>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Add comment</button>
+        </form>
+    </div>
+
+    <div class="task-history">
+        <h4>Task History</h4>
+        {% if task.logs.exists %}
+            <ul class="history-list">
+                {% for log in task.logs.all %}
+                    <li><span class="log-time">{{ log.created_at|date:"d M Y H:i" }}</span> — <strong>{{ log.user.username }}</strong>: {{ log.action }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No history yet.</p>
+        {% endif %}
+    </div>
+
+    <br><a href="{% url 'dashboard' %}" style="color: #007bff" class="back-link">← Back to Dashboard</a>
+</div>
+{% endblock %}
