@@ -5,5 +5,6 @@ class TasksConfig(AppConfig):
     name = 'tasks'
 
     def ready(self):
-        import tasks.tasks  # важно для Celery
+        import tasks.tasks
+        import tasks.signals
 

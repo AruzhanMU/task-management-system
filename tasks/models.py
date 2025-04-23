@@ -9,6 +9,8 @@ class CustomUser(AbstractUser):
     ]
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='worker')
 
+    telegram_id = models.BigIntegerField(blank=True, null=True, unique=True)
+
     def __str__(self):
         return f"{self.username} ({self.get_role_display()})"
 

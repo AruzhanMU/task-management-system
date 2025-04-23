@@ -1,11 +1,16 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from .models import CustomUser, Task, Comment
 
 class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = CustomUser
         fields = ('username', 'email', 'role', 'password1', 'password2')
+
+class CustomUserChangeForm(UserChangeForm):
+    class Meta:
+        model = CustomUser
+        fields = ('username', 'email', 'role')
 
 class TaskForm(forms.ModelForm):
     class Meta:
@@ -17,7 +22,7 @@ class TaskForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['assigned_to'].queryset = CustomUser.objects.filter(role='worker')
+        self.fields['assigned_to'].queryset = CustomUser.objects.filter(role__in=['worker', 'manager'])
 
 class CommentForm(forms.ModelForm):
     class Meta:

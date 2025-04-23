@@ -50,17 +50,19 @@
 
             <div class="task-actions">
                 <a href="{% url 'task_detail' task.pk %}">View</a>
+
                 {% if user == task.created_by or user.role == 'admin' %}
                     | <a href="{% url 'task_edit' task.pk %}">Edit</a>
                     | <a href="{% url 'task_delete' task.pk %}">Delete</a>
+                {% elif user == task.assigned_to and user.role == 'worker' %}
+                    | <a href="{% url 'task_edit' task.pk %}">Update Status</a>
                 {% endif %}
             </div>
         </div>
-        {% empty %}
-        <p>No tasks found.</p>
         {% endfor %}
     </div>
 {% else %}
     <p>No tasks found.</p>
 {% endif %}
 {% endblock %}
+

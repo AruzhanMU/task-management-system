@@ -1,0 +1,38 @@
+{% extends 'tasks/base.html' %}
+{% block content %}
+
+<h2 class="page-title">Users</h2>
+
+<a href="{% url 'user_create' %}" class="btn create-user" style="margin-bottom: 20px;">+ Create User</a>
+
+<div class="user-table-wrapper">
+    <table class="user-table">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.username }}</td>
+                <td>{{ user.email|default:"-" }}</td> {# Добавим default, если email может быть пустым #}
+                <td>{{ user.get_role_display }}</td>
+                <td>
+                    <a href="{% url 'user_edit' user.pk %}" class="link-action">Edit</a>
+                    <a href="{% url 'user_delete' user.pk %}" class="link-action">Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" style="text-align: center; padding: 20px; color: var(--text-muted);">No users found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

@@ -10,3 +10,5 @@ db.sqlite3
 .vscode/
 .idea/
 .DS_Store
+token.json
+credentials.json

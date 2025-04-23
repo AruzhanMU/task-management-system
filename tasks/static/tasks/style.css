@@ -1,97 +1,263 @@
+/* Define custom properties (variables) */
+:root {
+    --primary-color: #7c3aed;
+    --background-dark: #111111;
+    --background-card: #1e1e1e; /* Slightly lighter than main bg */
+    --background-input: #2a2a2a;
+    --background-hover: #292929;
+    --background-table-header: #2c2c2c;
+    --background-comment: #2f2f2f; /* Background for comments/history items */
+
+    --text-light: #ffffff;
+    --text-dark: #111111; /* For elements on light backgrounds */
+    --text-muted: #cccccc;
+    --text-link: #a78bfa; /* Lighter purple for links */
+    --text-link-hover: #ffffff;
+
+    --border-color: #444;
+    --border-color-table: #333;
+    --border-focus: var(--primary-color);
+
+    --shadow-color-light: rgba(0,0,0,0.2);
+    --shadow-color-medium: rgba(0,0,0,0.3);
+    --shadow-color-hover: rgba(0,0,0,0.25);
+
+    --hover-primary-darker: #5b21b6; /* Darker purple for button hover */
+    --hover-text-lighter: #e0e0e0;
+
+    /* Status & Priority Colors */
+    --color-priority-low: #6c757d;
+    --color-priority-medium: #ffc107;
+    --color-priority-high: #dc3545;
+    --color-status-new: #17a2b8;
+    --color-status-in-progress: #007bff;
+    --color-status-done: #28a745;
+    --color-message-success-bg: #224028; /* Darker green bg */
+    --color-message-success-text: #d4edda; /* Light green text */
+    --color-reminder-bg: #ffc107;
+    --color-reminder-text: var(--text-dark);
+
+    --radius-small: 6px;  /* Inputs, Buttons, Badges */
+    --radius-medium: 10px; /* Cards, Forms, Tables */
+    --radius-large: 12px; /* Stats cards specifically */
+    --radius-pill: 20px; /* Status pills */
+
+    --font-family-main: 'Segoe UI', sans-serif;
+    --max-width-container: 1100px;
+    --max-width-content: 1000px;
+
+    --transition-speed: 0.3s;
+}
+
+/* Global Styles & Box Sizing */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
 body {
     margin: 0;
-    font-family: 'Segoe UI', sans-serif;
-    background-color: #f7f7f7;
-    color: #111;
+    font-family: var(--font-family-main);
+    background-color: var(--background-dark);
+    color: var(--text-light);
+    line-height: 1.6; /* Improved readability */
 }
 
 a {
     text-decoration: none;
-    color: white;
+    color: var(--text-link); /* Default link color */
+    transition: color var(--transition-speed) ease;
+}
+a:hover {
+    color: var(--text-link-hover);
 }
 
+/* Navbar */
 .navbar {
-    background-color: #111;
+    background-color: var(--primary-color);
     position: fixed;
     top: 0;
     width: 100%;
     z-index: 1000;
-    padding: 10px 0;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    padding: 12px 0;
+    box-shadow: 0 2px 6px var(--shadow-color-medium);
 }
 
 .nav-container {
-    max-width: 1100px;
+    max-width: var(--max-width-container);
     margin: 0 auto;
     padding: 0 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    color: white;
+    color: var(--text-light);
 }
 
 .logo a {
-    font-weight: bold;
-    font-size: 20px;
-    color: white;
+    font-weight: 700;
+    font-size: 24px;
+    color: var(--text-light);
+}
+.logo a:hover {
+    color: var(--text-light); /* Keep logo color same on hover */
 }
 
 .nav-links a {
-    margin-left: 20px;
-    font-size: 14px;
-    color: white;
+    margin-left: 24px;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-light);
 }
 
+.nav-links a:hover {
+    color: var(--hover-text-lighter); /* Slight fade on hover */
+}
+
+/* Main Content Area */
 .main-content {
-    padding: 80px 20px 40px;
-    max-width: 900px;
+    padding: 90px 20px 40px;
+    max-width: var(--max-width-content);
     margin: auto;
 }
 
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+    line-height: 1.3;
+}
+h3 { font-size: 1.4em; }
+h4 { font-size: 1.2em; }
+
+/* Forms */
 form {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-    margin-bottom: 20px;
+    background: var(--background-card);
+    padding: 24px;
+    border-radius: var(--radius-medium);
+    box-shadow: 0 2px 8px var(--shadow-color-light);
+    margin-bottom: 30px;
+}
+
+form label {
+    display: block;
+    font-weight: 600;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    color: var(--text-muted);
 }
 
 input, select, textarea {
     width: 100%;
-    padding: 10px;
-    margin-top: 10px;
-    margin-bottom: 20px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    padding: 12px;
+    margin-top: 8px; /* Consistent spacing */
+    margin-bottom: 16px; /* Consistent spacing */
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-small);
     font-family: inherit;
+    font-size: 1em; /* Use relative units */
+    background: var(--background-input);
+    color: var(--text-light);
+    transition: border-color var(--transition-speed) ease, background-color var(--transition-speed) ease;
 }
 
-button {
-    padding: 10px 15px;
-    background: #111;
-    color: white;
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--border-focus);
+    background-color: var(--background-hover); /* Slightly change bg on focus */
+}
+
+/* Specific Input Types */
+input[type="file"] {
+    padding: 8px 12px;
+    background: var(--background-hover);
+    cursor: pointer;
+}
+input[type="file"]::-webkit-file-upload-button { /* Style the button inside file input */
+    background: var(--primary-color);
+    color: var(--text-light);
+    border: none;
+    padding: 6px 12px;
+    border-radius: var(--radius-small);
+    cursor: pointer;
+    margin-right: 10px;
+    transition: background-color var(--transition-speed) ease;
+}
+input[type="file"]::-webkit-file-upload-button:hover {
+    background: var(--hover-primary-darker);
+}
+input[type="datetime-local"] {
+     /* Datetime inputs might need specific styling for the picker */
+     /* appearance: none; /* Reset default appearance if needed */
+}
+
+
+form p { /* Paragraphs within forms */
+    margin-top: 5px;
+    margin-bottom: 10px;
+    font-size: 0.9em;
+    color: var(--text-muted);
+}
+
+/* Buttons */
+button, .btn { /* Combine general button and .btn styles */
+    display: inline-block; /* Ensure .btn works like button */
+    padding: 10px 18px; /* Adjusted padding slightly */
+    background: var(--primary-color);
+    color: var(--text-light);
     border: none;
     cursor: pointer;
-    border-radius: 4px;
+    border-radius: var(--radius-small);
+    font-weight: 600;
+    font-size: 1em; /* Use relative units */
+    text-align: center;
+    text-decoration: none; /* For .btn used as link */
+    transition: background-color var(--transition-speed) ease, transform 0.1s ease;
+    margin-right: 10px; /* Default margin for spacing */
+    margin-bottom: 10px; /* Spacing below button */
+}
+button:last-child, .btn:last-child {
+    margin-right: 0; /* Remove margin from last button */
 }
 
-button:hover {
-    background: #333;
+button:hover, .btn:hover {
+    background: var(--hover-primary-darker);
+    text-decoration: none; /* Ensure no underline on hover */
+    color: var(--text-light);
+}
+button:active, .btn:active {
+    transform: scale(0.98); /* Slight press effect */
 }
 
+/* Specific Button Variants */
+.btn-download { /* Already styled like default button */
+    /* Inherits base styles */
+}
+
+.create-user { /* Already styled like default button */
+     margin-bottom: 12px; /* Keep specific margin if needed */
+     /* Inherits base styles */
+}
+
+/* Messages (e.g., success/error) */
 .messages {
     list-style: none;
     padding: 0;
     margin-bottom: 20px;
 }
 
-.messages li {
-    background: #dff0d8;
-    color: #3c763d;
-    padding: 10px;
-    border-radius: 5px;
+.messages li { /* Default message style */
+    padding: 12px 15px;
+    border-radius: var(--radius-small);
+    margin-bottom: 10px;
 }
+/* Example Success Message */
+.messages li.success {
+    background: var(--color-message-success-bg);
+    color: var(--color-message-success-text);
+    border-left: 4px solid var(--color-status-done); /* Add accent border */
+}
+/* Add other message types (error, warning, info) similarly */
 
+/* Stats Section */
 .stats {
     display: flex;
     justify-content: space-between;
@@ -101,31 +267,36 @@ button:hover {
 
 .stats .card {
     flex: 1;
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    background: var(--background-card);
+    padding: 24px;
+    border-radius: var(--radius-large);
+    box-shadow: 0 2px 8px var(--shadow-color-light);
     text-align: center;
-    transition: all 0.3s ease;
+    transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+    min-width: 0;
 }
 
 .stats .card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transform: translateY(-4px); /* Slightly more lift */
+    box-shadow: 0 6px 14px var(--shadow-color-hover);
 }
 
 .stats .card h4 {
-    font-size: 16px;
+    font-size: 1em; /* Relative font size */
+    margin-top: 0;
     margin-bottom: 10px;
-    color: #666;
+    color: var(--text-muted);
+    font-weight: 500; /* Lighter weight for subtitle */
 }
 
 .stats .card p {
-    font-size: 24px;
-    font-weight: bold;
-    color: #111;
+    font-size: 2em; /* Larger font size for stat value */
+    font-weight: 700; /* Bolder */
+    color: var(--text-light);
+    margin: 0;
 }
 
+/* Task List */
 .task-list {
     display: grid;
     grid-template-columns: 1fr;
@@ -133,15 +304,15 @@ button:hover {
 }
 
 .task-card {
-    background: white;
-    border-radius: 10px;
+    background: var(--background-card);
+    border-radius: var(--radius-medium);
     padding: 20px;
-    box-shadow: 0 1px 5px rgba(0,0,0,0.1);
-    transition: all 0.3s ease;
+    box-shadow: 0 2px 6px var(--shadow-color-light);
+    transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
 }
 
 .task-card:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    box-shadow: 0 6px 14px var(--shadow-color-medium);
     transform: translateY(-3px);
 }
 
@@ -149,283 +320,212 @@ button:hover {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
 .task-header h3 {
     margin: 0;
-    font-size: 18px;
+    font-size: 1.2em; /* Relative font size */
+    flex-grow: 1;
 }
 
 .task-actions {
-    margin-top: 10px;
-    font-size: 14px;
+    margin-top: 15px; /* More space before actions */
+    font-size: 0.9em;
 }
 
 .task-actions a {
-    margin-right: 10px;
-    color: #007bff;
-}
-
-.priority {
-    padding: 2px 8px;
-    border-radius: 6px;
-    font-size: 13px;
-    color: white;
-}
-
-.priority-low { background: #6c757d; }
-.priority-medium { background: #ffc107; }
-.priority-high { background: #dc3545; }
-
-.status {
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 12px;
-    color: white;
-    text-transform: uppercase;
-}
-
-.status-new { background: #17a2b8; }
-.status-in_progress { background: #007bff; }
-.status-done { background: #28a745; }
-
-form select {
-    width: 100%;
-    padding: 10px;
-    font-size: 14px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    background: #fff;
-    margin-bottom: 30px;
-}
-
-ul {
-    list-style: none;
-    padding-left: 0;
-}
-
-ul li {
-    background: #f5f5f5;
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 6px;
-    font-size: 14px;
-}
-
-form label {
-    display: block;
-    font-weight: 600;
-    margin-top: 15px;
-    margin-bottom: 5px;
-    color: #333;
-}
-
-form input[type="text"],
-form input[type="datetime-local"],
-form select,
-form textarea,
-form input[type="file"] {
-    width: 100%;
-    padding: 10px 12px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    background-color: #fafafa;
-    transition: border-color 0.2s ease;
-}
-
-form input[type="file"] {
-    padding: 8px;
-    background: #f1f1f1;
-    cursor: pointer;
-}
-
-form input:focus,
-form select:focus,
-form textarea:focus {
-    outline: none;
-    border-color: #007bff;
-    background: #fff;
-}
-
-form button {
-    margin-top: 20px;
-    padding: 10px 20px;
-    background: #111;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: background 0.3s ease;
-}
-
-form button:hover {
-    background: #333;
-}
-
-form p {
-    margin-top: 5px;
-    margin-bottom: 10px;
-}
-
-.btn-download {
-    display: inline-block;
-    margin-top: 5px;
-    padding: 8px 14px;
-    background-color: #111;
-    color: #fff;
-    font-size: 14px;
-    border-radius: 6px;
-    text-decoration: none;
-    transition: background 0.2s ease;
-}
-
-.btn-download:hover {
-    background-color: #333;
-    text-decoration: none;
-}
-
-/* 🔘 Кнопки */
-.btn {
-    display: inline-block;
-    padding: 10px 16px;
-    margin-right: 10px;
-    border-radius: 6px;
-    font-size: 14px;
-    text-decoration: none;
+    margin-right: 12px;
+    color: var(--text-link); /* Use themed link color */
     font-weight: 500;
 }
-
-.btn-download {
-    background-color: #343a40;
-    color: white;
-    transition: background 0.3s;
+.task-actions a:last-child {
+    margin-right: 0;
+}
+.task-actions a:hover {
+     color: var(--text-link-hover);
 }
 
-.btn-download:hover {
-    background-color: #212529;
+/* Priority Badges */
+.priority {
+    padding: 3px 10px;
+    border-radius: var(--radius-small); /* Consistent radius */
+    font-size: 0.85em; /* Relative size */
+    font-weight: 600;
+    color: var(--text-light);
+    display: inline-block;
+    line-height: 1.4; /* Adjust line height */
+    text-align: center;
 }
 
-/* 💬 Комментарии */
+.priority-low { background: var(--color-priority-low); }
+.priority-medium { background: var(--color-priority-medium); color: var(--text-dark); }
+.priority-high { background: var(--color-priority-high); }
+
+/* Status Pills */
+.status {
+    padding: 5px 12px;
+    border-radius: var(--radius-pill);
+    font-size: 0.8em; /* Relative size */
+    font-weight: 600;
+    color: var(--text-light);
+    text-transform: uppercase;
+    display: inline-block;
+    line-height: 1.4; /* Adjust line height */
+    text-align: center;
+}
+
+.status-new { background: var(--color-status-new); }
+.status-in_progress { background: var(--color-status-in-progress); }
+.status-done { background: var(--color-status-done); }
+
+/* Comments Section */
 .comment-section {
     margin-top: 40px;
-    background: #fefefe;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 1px 6px rgba(0,0,0,0.1);
+    background: var(--background-card);
+    padding: 24px;
+    border-radius: var(--radius-medium);
+    box-shadow: 0 1px 6px var(--shadow-color-light);
+}
+.comment-section h4 { /* Style heading if needed */
+    margin-top: 0;
+    color: var(--text-muted);
 }
 
-.comment-list {
+.comment-list, .history-list { /* Combine list styles */
     list-style: none;
     padding-left: 0;
+    margin-top: 15px;
     margin-bottom: 20px;
 }
 
-.comment-list li {
-    background: #f3f3f3;
-    padding: 10px;
-    border-radius: 6px;
+.comment-list li, .history-list li {
+    background: var(--background-comment); /* Use specific bg */
+    padding: 12px 15px;
+    border-radius: var(--radius-small);
     margin-bottom: 10px;
-    font-size: 14px;
+    font-size: 0.95em;
+    line-height: 1.5;
+}
+.comment-list li:last-child, .history-list li:last-child {
+    margin-bottom: 0;
 }
 
-.comment-meta {
-    font-size: 12px;
-    color: #666;
+.comment-meta, .log-time { /* Combine meta styles */
+    font-size: 0.8em;
+    color: var(--text-muted);
+    display: block; /* Ensure it appears on its own line or as needed */
+    margin-top: 4px;
 }
 
-/* 🕓 История изменений */
+/* Task History Section */
 .task-history {
     margin-top: 30px;
-    background: #fdfdfd;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    background: var(--background-card);
+    padding: 24px;
+    border-radius: var(--radius-medium);
+    box-shadow: 0 1px 4px var(--shadow-color-light);
+}
+.task-history h4 { /* Style heading if needed */
+     margin-top: 0;
+     color: var(--text-muted);
 }
 
-.history-list {
-    list-style: none;
-    padding-left: 0;
-}
-
-.history-list li {
-    font-size: 14px;
-    margin-bottom: 8px;
-}
-
-.log-time {
-    color: #888;
-    font-size: 12px;
-}
-
-a.back-link {
-    display: inline-block;
-    margin-top: 20px;
-    font-size: 14px;
-    color: #555;
-    text-decoration: none;
-}
-
-a.back-link:hover {
-    color: #000;
-    text-decoration: underline;
-}
-
+/* Reminder Label */
 .reminder-label {
     display: inline-block;
     margin-top: 6px;
-    padding: 3px 8px;
-    font-size: 12px;
-    background: #ffc107;
-    color: #111;
-    border-radius: 4px;
+    padding: 4px 10px;
+    font-size: 0.8em;
+    background: var(--color-reminder-bg);
+    color: var(--color-reminder-text);
+    border-radius: var(--radius-small);
+    font-weight: 600;
+}
+
+/* Back Link */
+a.back-link {
+    display: inline-block;
+    margin-top: 20px;
+    font-size: 0.9em;
+    color: var(--text-muted);
+    text-decoration: none;
+}
+a.back-link:hover {
+    color: var(--text-light);
+    text-decoration: underline;
+}
+
+/* Lists (Generic) */
+ul {
+    list-style: disc; /* Default list style */
+    padding-left: 25px; /* Indentation */
+    margin-bottom: 15px;
+}
+ul li {
+    /* Basic styling for generic list items if needed outside specific components */
+    margin-bottom: 8px;
+}
+
+/* User Table */
+.user-table-wrapper {
+    overflow-x: auto;
+    margin-top: 20px;
+    background: var(--background-card);
+    border-radius: var(--radius-medium);
+    box-shadow: 0 2px 8px var(--shadow-color-light);
+}
+
+.user-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+}
+
+.user-table th,
+.user-table td {
+    padding: 14px 18px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color-table);
+    white-space: nowrap;
+    vertical-align: middle; /* Align cell content vertically */
+}
+
+.user-table th {
+    background-color: var(--background-table-header);
+    font-weight: 600;
+    color: var(--text-light);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.user-table tr:last-child td {
+    border-bottom: none;
+}
+
+.user-table tr:hover {
+    background-color: var(--background-hover);
+}
+
+/* Action Link within Table/etc. */
+.link-action {
+    color: var(--text-link); /* Use themed link color */
     font-weight: 500;
+    margin-right: 10px; /* Add spacing between actions */
+}
+.link-action:last-child {
+    margin-right: 0;
 }
 
-@media (max-width: 768px) {
-    .stats {
-        flex-direction: column;
-    }
-
-    .task-card {
-        padding: 16px;
-    }
-
-    .nav-container {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-    }
-
-    .task-header h3 {
-        font-size: 16px;
-    }
-
-    .task-header .status {
-        font-size: 11px;
-        padding: 3px 8px;
-    }
-
-    .main-content {
-        padding: 90px 16px 40px;
-    }
-
-    .task-actions a {
-        display: inline-block;
-        margin-top: 8px;
-    }
-
-    .btn {
-        width: 100%;
-        margin-bottom: 10px;
-    }
+.link-action:hover {
+    text-decoration: underline;
+    color: var(--text-link-hover);
 }
 
-
-
-/* Общий fade-in */
+/* Fade-in Animation */
 .fade-in {
     animation: fadeIn 0.6s ease forwards;
     opacity: 0;
@@ -443,4 +543,111 @@ a.back-link:hover {
 }
 
 
+/* --- Media Queries for Responsiveness --- */
 
+@media (max-width: 768px) {
+    body { font-size: 15px; } /* Adjust base font slightly */
+
+    .stats {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .nav-links a {
+        margin-left: 15px;
+        font-size: 15px;
+    }
+
+    .logo a {
+        font-size: 22px;
+    }
+
+    .main-content {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    .nav-container {
+         padding: 0 15px;
+         /* Adjust layout if needed, e.g., wrap */
+         /* flex-wrap: wrap; */
+         /* justify-content: center; */
+    }
+    /* Consider adding hamburger menu toggle here */
+}
+
+@media (max-width: 480px) {
+    body {
+        font-size: 14px;
+    }
+
+    .main-content {
+        padding-top: 80px;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+     .nav-container {
+        padding: 10px; /* Adjust padding */
+        flex-direction: column; /* Stack logo and links */
+        align-items: center; /* Center items */
+        gap: 10px;
+     }
+     .nav-links {
+        /* Example: Hide links for hamburger menu (requires JS/HTML changes) */
+        /* display: none; */
+        margin-top: 10px; /* Space when stacked */
+        margin-left: 0; /* Reset margin */
+        text-align: center;
+     }
+     .nav-links a {
+         margin: 0 10px; /* Space between links when stacked/visible */
+     }
+
+
+    .logo a {
+        font-size: 20px;
+    }
+
+    .stats .card {
+        padding: 15px;
+    }
+
+    .stats .card p {
+        font-size: 1.8em; /* Adjust stat font size */
+    }
+
+    form {
+        padding: 15px;
+    }
+
+    button, .btn {
+        padding: 10px 15px;
+        width: 100%; /* Make buttons full width */
+        margin-right: 0; /* Remove right margin for full width */
+    }
+
+    .task-header {
+         flex-direction: column;
+         align-items: flex-start;
+         gap: 5px; /* Reduce gap when stacked */
+    }
+    .task-header .status, .task-header .priority {
+         margin-top: 5px; /* Add space above status/priority when stacked */
+    }
+
+
+    .task-card {
+        padding: 15px;
+    }
+
+    .user-table th,
+    .user-table td {
+        padding: 10px 12px;
+        font-size: 0.9em; /* Slightly smaller table text */
+    }
+
+    .user-table {
+        min-width: 400px;
+    }
+}

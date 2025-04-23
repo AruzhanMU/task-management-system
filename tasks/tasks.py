@@ -19,7 +19,6 @@ def send_deadline_reminders():
         message = f"Reminder: Task '{task.title}' is due in 24 hours (Deadline: {task.deadline.strftime('%d %b %Y %H:%M')})."
         print(message)
 
-        # Отправка письма
         send_mail(
             subject="Task Reminder",
             message=message,
@@ -28,6 +27,5 @@ def send_deadline_reminders():
             fail_silently=True,
         )
 
-        # Обновим статус отправки
         task.reminder_sent = True
         task.save()

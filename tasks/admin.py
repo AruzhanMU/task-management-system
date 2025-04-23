@@ -4,9 +4,14 @@ from django.contrib.auth.admin import UserAdmin
 
 class CustomUserAdmin(UserAdmin):
     model = CustomUser
-    list_display = ['username', 'email', 'role', 'is_staff']
+    list_display = ['username', 'email', 'role', 'telegram_id', 'is_staff']
+
     fieldsets = UserAdmin.fieldsets + (
-        (None, {'fields': ('role',)}),
+        (None, {'fields': ('role', 'telegram_id')}),
+    )
+
+    add_fieldsets = UserAdmin.add_fieldsets + (
+        (None, {'fields': ('role', 'telegram_id')}),
     )
 
 class TaskAdmin(admin.ModelAdmin):

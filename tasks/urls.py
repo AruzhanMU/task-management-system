@@ -22,4 +22,9 @@ urlpatterns = [
         template_name='tasks/password_reset_confirm.html'), name='password_reset_confirm'),
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(
         template_name='tasks/password_reset_complete.html'), name='password_reset_complete'),
+    path('users/', views.users_list, name='users_list'),
+    path('users/create/', views.user_create, name='user_create'),
+    path('users/<int:pk>/edit/', views.user_edit, name='user_edit'),
+    path('users/<int:pk>/delete/', views.user_delete, name='user_delete'),
+    path('users/set-password/<int:user_id>/', views.set_user_password, name='set_user_password'),
 ]

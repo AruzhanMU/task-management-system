@@ -19,7 +19,7 @@
     <p><strong>Created by:</strong> {{ task.created_by.username }}</p>
     {% if task.attachment %}
         <p><strong>Attachment:</strong>
-            <a href="{{ task.attachment.url }}" target="_blank" class="btn-download"> Download file</a>
+            <a href="{{ task.attachment.url }}" target="_blank" class="btn-download">Download file</a>
         </p>
     {% endif %}
     <hr>
@@ -58,6 +58,10 @@
             <p>No history yet.</p>
         {% endif %}
     </div>
+
+    {% if user == task.assigned_to and user.role == 'worker' %}
+        <a href="{% url 'task_edit' task.id %}" class="btn-download" style="margin-top: 20px; display: inline-block;">Update Status</a>
+    {% endif %}
 
     <br><a href="{% url 'dashboard' %}" style="color: #007bff" class="back-link">← Back to Dashboard</a>
 </div>

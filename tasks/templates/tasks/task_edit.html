@@ -6,25 +6,31 @@
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
 
-        <label>Title</label>
-        {{ form.title }}
+        {% if user.role == 'worker' %}
+            <label>Status</label>
+            {{ form.status }}
+        {% else %}
+            <label>Title</label>
+            {{ form.title }}
 
-        <label>Description</label>
-        {{ form.description }}
+            <label>Description</label>
+            {{ form.description }}
 
-        <label>Deadline</label>
-        {{ form.deadline }}
+            <label>Deadline</label>
+            {{ form.deadline }}
 
-        <label>Assign to</label>
-        {{ form.assigned_to }}
+            <label>Assign to</label>
+            {{ form.assigned_to }}
 
-        <label>Priority</label>
-        {{ form.priority }}
+            <label>Priority</label>
+            {{ form.priority }}
 
-        <label>Status</label>
-        {{ form.status }}
+            <label>Status</label>
+            {{ form.status }}
+        {% endif %}
 
         <button type="submit">Save</button>
     </form>
-</div>>
+</div>
 {% endblock %}
+

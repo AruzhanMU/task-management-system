@@ -1,0 +1,43 @@
+{% extends 'tasks/base.html' %}
+{% block content %}
+
+<h2 class="page-title">User Form</h2>
+
+<form method="post">
+    {% csrf_token %}
+
+    {% for field in form %}
+        {% if field.name == 'password' %}
+            <div class="form-field-wrapper" style="margin-bottom: 15px;">
+                <label>Password:</label>
+                <a href="{% url 'set_user_password' user.id %}" class="btn-download" style="margin-top: 5px;">Set new password</a>
+                <p class="help-text" style="font-size: 0.9em; color: #aaa; margin-top: 5px;">
+                    Raw passwords are not stored. You can set a new one.
+                </p>
+            </div>
+        {% else %}
+            <div class="form-field-wrapper" style="margin-bottom: 15px;">
+                {{ field.label_tag }}
+                {{ field }}
+
+                {% if field.errors %}
+                    <div class="field-errors" style="color: #dc3545; font-size: 0.9em; margin-top: 5px;">
+                        {{ field.errors }}
+                    </div>
+                {% endif %}
+
+                {% if field.help_text %}
+                    <p class="help-text" style="font-size: 0.9em; color: #aaa; margin-top: 5px;">
+                        {{ field.help_text }}
+                    </p>
+                {% endif %}
+            </div>
+        {% endif %}
+    {% endfor %}
+
+    <button type="submit" class="btn">Save User</button>
+</form>
+
+<a href="{% url 'users_list' %}" class="back-link" style="margin-top: 25px; display: inline-block;">← Back to user list</a>
+
+{% endblock %}
