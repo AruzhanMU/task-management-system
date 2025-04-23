@@ -1,6 +1,9 @@
 from telegram.ext import Updater, CommandHandler
 import os
 import django
+from dotenv import load_dotenv
+
+load_dotenv()
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "task_manager.settings")
 django.setup()
@@ -24,7 +27,9 @@ def my_tasks(update, context):
         response = "❌ You are not registered. Please contact the admin."
     update.message.reply_text(response)
 
-updater = Updater("8053088019:AAF0T9JPTJPV75FWE2r_zQ2eHNe3S7FBaLA", use_context=True)
+TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+
+updater = Updater(TOKEN, use_context=True)
 dp = updater.dispatcher
 
 dp.add_handler(CommandHandler("start", start))
@@ -32,3 +37,5 @@ dp.add_handler(CommandHandler("tasks", my_tasks))
 
 updater.start_polling()
 updater.idle()
+
+

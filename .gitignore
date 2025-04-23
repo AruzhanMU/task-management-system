@@ -12,3 +12,5 @@ db.sqlite3
 .DS_Store
 token.json
 credentials.json
+celerybeat-schedule.db
+dump.rdb

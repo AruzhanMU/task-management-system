@@ -1,92 +1,116 @@
-# Task Management System
+# 🗂️ Task Management System
 
-This is a web-based **Task Management System** built with **Django**, designed to help users create, assign, track, and manage tasks with various statuses, priorities, and deadlines. The system supports role-based access control, where users can be assigned different roles: **Admin**, **Manager**, or **User**.
+**A complete task and user management system built with Django, integrated with Google Calendar and Telegram for seamless task notifications and coordination.**
 
-## Features
-- **User Registration and Management**: Users can register, log in, and reset passwords.
-- **Role-based Access**: Admin, Manager, and User roles with different levels of access.
-- **Task Management**: Create, assign, and track tasks.
-- **Task Filtering**: Filter tasks by status (New, In Progress, Done).
-- **File Attachments**: Attach files to tasks.
-- **Comments and Task History**: Add comments to tasks and track their history (status changes, user actions).
-- **Email Notifications**: Notify users about task assignments and deadlines.
+---
 
-## Tech Stack
-- **Backend**: Django (Python)
-- **Database**: SQLite
-- **Frontend**: HTML, CSS 
-- **Others**: Python, Git, GitHub
+## 🚀 Features
 
-## Installation
+### 👤 User Management
+- Roles: **Admin**, **Manager**, **Executor**
+- Registration, login, logout, password reset
+- Admin dashboard for user creation and editing
 
-### Prerequisites:
-- Python 3.x
-- pip (Python package installer)
+### ✅ Task Management
+- Create, assign, and filter tasks
+- Add deadlines, priority levels, and attachments
+- Status tracking: `New`, `In Progress`, `Done`
+- Task edit and delete permissions by role
 
-### Steps to Run the Project Locally:
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/AruzhanMU/task-management-system.git
-   ```
+### 💬 Collaboration & Communication
+- Comment system on tasks
+- Task activity history logging (status changes, assignments, edits)
+- Email + Telegram notifications
 
-2. **Navigate to the project directory**:
-   ```bash
-   cd task-management-system
-   ```
+### 📆 Google Calendar Integration
+- Tasks are automatically added to Google Calendar
+- Auth via OAuth2 using your Google account
 
-3. **Create a virtual environment**:
-   ```bash
-   python3 -m venv venv
-   ```
+### 🤖 Telegram Bot Integration
+- Link your Telegram with your account using `/start`
+- Use `/tasks` to view assigned tasks
+- Auto-message when task is assigned
+- Inline buttons to update task status (coming soon)
 
-4. **Activate the virtual environment**:
-   - On macOS/Linux:
-     ```bash
-     source venv/bin/activate
-     ```
-   - On Windows:
-     ```bash
-     .\venv\Scripts\activate
-     ```
+---
 
-5. **Install dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
+## 🧑‍💻 Technologies Used
 
-6. **Setup database and migrations**:
-   ```bash
-   python manage.py makemigrations
-   python manage.py migrate
-   ```
+- **Backend:** Python, Django, Django ORM, Celery, Redis
+- **Frontend:** HTML, CSS (Bootstrap/Tailwind), Django Templates
+- **Database:** SQLite
+- **Integrations:** Google Calendar API, Telegram Bot API
 
-7. **Create a superuser** (optional, for admin access):
-   ```bash
-   python manage.py createsuperuser
-   ```
+---
 
-8. **Run the server**:
-   ```bash
-   python manage.py runserver
-   ```
+## 📦 Installation Guide
 
-9. **Access the application**:  
-   Open [http://127.0.0.1:8000/](http://127.0.0.1:8000/) in your browser.
+### ⚙️ Requirements
+- Python 3.11+
+- Virtualenv (recommended)
 
-### Accessing the Admin Panel:
-- Visit: [http://127.0.0.1:8000/admin](http://127.0.0.1:8000/admin)
-- Use the superuser credentials to log in.
+### 🔧 Setup Steps
 
-## Usage
+```bash
+# Clone the repository
+$ git clone https://github.com/AruzhanMU/task-management-system.git
+$ cd task-management-system
 
-Once the project is running, you can:
-- **Log in** with your registered credentials.
-- **Create tasks**, assign them to users, and track their progress.
-- **Admin users** can manage users, assign roles, and view all tasks.
-- **Comment on tasks** and view their history of changes.
-- **View task details**, including priorities, deadlines, and attachments.
+# Create virtual environment
+$ python3 -m venv .venv
+$ source .venv/bin/activate  # On Windows use .venv\Scripts\activate
 
-## Acknowledgements
+# Install dependencies
+$ pip install -r requirements.txt
 
-- This project was built using Django, a high-level Python web framework.
-- Thanks to all contributors for their valuable input.
+# Run migrations
+$ python manage.py migrate
+
+# Create a superuser
+$ python manage.py createsuperuser
+
+# Run the server
+$ python manage.py runserver
+```
+
+---
+
+## 🔐 Google Calendar Setup
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a project and enable Google Calendar API
+3. Create OAuth client ID (Desktop)
+4. Download the JSON file and rename it to `credentials.json`
+5. Place it in the project root
+6. The first time you run calendar sync, it will prompt login and generate `token.json`
+
+---
+
+## 🤖 Telegram Bot Setup
+
+1. Go to [@BotFather](https://t.me/BotFather)
+2. Create a bot and copy the token
+3. Save it in `telegram_bot.py`
+4. Run the bot:
+
+```bash
+python telegram_bot.py
+```
+
+5. In Telegram:
+   - Send `/start` to the bot to link your account
+   - Send `/tasks` to view your tasks
+   
+---
+
+## 👩‍💻 Author
+
+**AruzhanMU**  — Student Developer at IITU, Almaty 🇰🇿  
+Made with <3 using Django, Google APIs and lots of motivation.
+
+---
+
+## 📜 License
+
+This project is open-source for educational and personal use.
+
