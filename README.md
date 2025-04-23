@@ -105,12 +105,13 @@ python telegram_bot.py
 
 ## 👩‍💻 Author
 
-**AruzhanMU**  — Student Developer at IITU, Almaty 🇰🇿  
+**AruzhanMU**  
 Made with <3 using Django, Google APIs and lots of motivation.
 
 ---
 
-## 📜 License
+## 📄 License
 
-This project is open-source for educational and personal use.
+
+This project is licensed under the MIT License - see the LICENSE file for details.
 
