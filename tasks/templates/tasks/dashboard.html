@@ -32,6 +32,16 @@
     </select>
 </form>
 
+<form method="get" style="margin-top: 20px;">
+    <label for="priority">Filter by priority:</label>
+    <select name="priority" id="priority" onchange="this.form.submit()">
+        <option value="">All</option>
+        <option value="low" {% if request.GET.priority == 'low' %}selected{% endif %}>Low</option>
+        <option value="medium" {% if request.GET.priority == 'medium' %}selected{% endif %}>Medium</option>
+        <option value="high" {% if request.GET.priority == 'high' %}selected{% endif %}>High</option>
+    </select>
+</form>
+
 {% if tasks %}
     <div class="task-list">
         {% for task in tasks %}
@@ -46,8 +56,16 @@
             {% if task.reminder_sent %}
                 <span class="reminder-label">Reminder sent</span>
             {% endif %}
-            <p><strong>Assigned to:</strong> {{ task.assigned_to.username }}</p>
-
+            <p>
+                Assigned to:
+                {% if task.assigned_to %}
+                    {{ task.assigned_to.username }}
+                {% elif task.group_assigned %}
+                    Group: {{ task.group_assigned.name }}
+                {% else %}
+                    Not assigned
+                {% endif %}
+            </p>
             <div class="task-actions">
                 <a href="{% url 'task_detail' task.pk %}">View</a>
 

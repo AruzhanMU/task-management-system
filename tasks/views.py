@@ -1,11 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout, get_user_model
-from .forms import CustomUserCreationForm, TaskForm, CommentForm, CustomUserChangeForm
+from .forms import CustomUserCreationForm, TaskForm, CommentForm, CustomUserChangeForm, GroupForm, CustomUser, Group
 from django.contrib.auth.decorators import login_required
 from .models import Task
 from django.contrib import messages
 from .utils import log_task_action
-from django.db.models import Count
+from django.db.models import Count, Q
 import csv
 from django.http import HttpResponse
 from weasyprint import HTML
@@ -28,38 +28,44 @@ def logout_view(request):
     logout(request)
     return redirect('login')
 
-from django.db.models import Q
-
 @login_required
 def dashboard(request):
     status_filter = request.GET.get('status')
+    priority_filter = request.GET.get('priority')
 
     if request.user.role == 'admin':
         tasks = Task.objects.all()
+
     elif request.user.role == 'manager':
-        # задачи, назначенные на него ИЛИ созданные им (назначенные другим)
         tasks = Task.objects.filter(
-            Q(assigned_to=request.user) | Q(created_by=request.user)
+            Q(assigned_to=request.user) |
+            Q(created_by=request.user)
         )
-    else:
-        tasks = Task.objects.filter(assigned_to=request.user)
+
+    else:  # worker
+        tasks = Task.objects.filter(
+            Q(assigned_to=request.user) |
+            Q(assigned_group__members=request.user)  # 👈 Задачи групп, в которых состоит пользователь
+        ).distinct()
 
     if status_filter:
         tasks = tasks.filter(status=status_filter)
+
+    if priority_filter:
+        tasks = tasks.filter(priority=priority_filter)
 
     total = tasks.count()
     new = tasks.filter(status='new').count()
     in_progress = tasks.filter(status='in_progress').count()
     done = tasks.filter(status='done').count()
 
-    context = {
+    return render(request, 'tasks/dashboard.html', {
         'tasks': tasks,
         'total': total,
         'new': new,
         'in_progress': in_progress,
-        'done': done
-    }
-    return render(request, 'tasks/dashboard.html', context)
+        'done': done,
+    })
 
 @login_required
 def task_create(request):
@@ -72,7 +78,19 @@ def task_create(request):
         if form.is_valid():
             task = form.save(commit=False)
             task.created_by = request.user
+
+            # 👉 Добавляем назначение группы
+            group_id = request.POST.get('group')
+            if group_id:
+                from .models import Group  # если ещё не импортировал
+                try:
+                    group = Group.objects.get(id=group_id)
+                    task.group_assigned = group
+                except Group.DoesNotExist:
+                    pass  # если вдруг группу удалили
+
             task.save()
+            form.save_m2m()
 
             try:
                 create_calendar_event(task)
@@ -84,7 +102,14 @@ def task_create(request):
     else:
         form = TaskForm()
 
-    return render(request, 'tasks/task_create.html', {'form': form})
+    # 🛠 Передаём список всех групп в форму
+    from .models import Group
+    groups = Group.objects.all()
+
+    return render(request, 'tasks/task_create.html', {
+        'form': form,
+        'groups': groups,
+    })
 
 @login_required
 def task_edit(request, pk):
@@ -228,11 +253,12 @@ User = get_user_model()
 
 @login_required
 def users_list(request):
-    if request.user.role != 'admin':
-        messages.error(request, "Access denied.")
-        return redirect('dashboard')
-    users = User.objects.all()
-    return render(request, 'tasks/users_list.html', {'users': users})
+    users = CustomUser.objects.all()
+    if request.user.role == 'admin':
+        groups = Group.objects.all()
+    else:  # Менеджер видит только свои группы
+        groups = Group.objects.filter(created_by=request.user)
+    return render(request, 'tasks/users_list.html', {'users': users, 'groups': groups})
 
 @login_required
 def user_create(request):
@@ -292,3 +318,62 @@ def set_user_password(request, user_id):
         form = SetPasswordForm(user)
 
     return render(request, 'tasks/set_user_password.html', {'form': form, 'user': user})
+
+@login_required
+def group_create(request):
+    if request.user.role not in ['admin', 'manager']:
+        return redirect('dashboard')
+
+    if request.method == 'POST':
+        form = GroupForm(request.POST, user=request.user)  # <-- передаем user
+        if form.is_valid():
+            group = form.save(commit=False)
+            group.created_by = request.user
+            group.save()
+            form.save_m2m()  # сохранить участников
+            messages.success(request, 'Group created successfully.')
+            return redirect('users_list')
+    else:
+        form = GroupForm(user=request.user)  # <-- передаем user
+
+    return render(request, 'tasks/group_create.html', {'form': form})
+
+@login_required
+def groups_list(request):
+    if request.user.role == 'admin':
+        groups = Group.objects.all()
+    else:  # manager
+        groups = Group.objects.filter(created_by=request.user)
+
+    return render(request, 'tasks/groups_list.html', {'groups': groups})
+
+@login_required
+def group_edit(request, pk):
+    group = get_object_or_404(Group, pk=pk)
+
+    if request.user.role == 'manager' and group.created_by != request.user:
+        messages.error(request, 'You are not allowed to edit this group.')
+        return redirect('users_list')
+
+    if request.method == 'POST':
+        form = GroupForm(request.POST, instance=group, user=request.user)  # <-- передаем user
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Group updated successfully.')
+            return redirect('users_list')
+    else:
+        form = GroupForm(instance=group, user=request.user)  # <-- передаем user
+
+    return render(request, 'tasks/group_edit.html', {'form': form, 'group': group})
+
+@login_required
+def group_delete(request, pk):
+    group = get_object_or_404(Group, pk=pk)
+
+    if request.user.role == 'manager' and group.created_by != request.user:
+        messages.error(request, 'You are not allowed to delete this group.')
+        return redirect('users_list')
+
+    group.delete()
+    messages.success(request, 'Group deleted successfully.')
+    return redirect('users_list')

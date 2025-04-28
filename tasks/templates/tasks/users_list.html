@@ -3,7 +3,9 @@
 
 <h2 class="page-title">Users</h2>
 
+{% if user.role == 'admin' %}
 <a href="{% url 'user_create' %}" class="btn create-user" style="margin-bottom: 20px;">+ Create User</a>
+{% endif %}
 
 <div class="user-table-wrapper">
     <table class="user-table">
@@ -12,19 +14,23 @@
                 <th>Username</th>
                 <th>Email</th>
                 <th>Role</th>
+                {% if user.role == 'admin' %}
                 <th>Actions</th>
+                {% endif %}
             </tr>
         </thead>
         <tbody>
-            {% for user in users %}
+            {% for u in users %}
             <tr>
-                <td>{{ user.username }}</td>
-                <td>{{ user.email|default:"-" }}</td> {# Добавим default, если email может быть пустым #}
-                <td>{{ user.get_role_display }}</td>
+                <td>{{ u.username }}</td>
+                <td>{{ u.email|default:"-" }}</td>
+                <td>{{ u.get_role_display }}</td>
+                {% if user.role == 'admin' %}
                 <td>
-                    <a href="{% url 'user_edit' user.pk %}" class="link-action">Edit</a>
-                    <a href="{% url 'user_delete' user.pk %}" class="link-action">Delete</a>
+                    <a href="{% url 'user_edit' u.pk %}" class="link-action">Edit</a>
+                    <a href="{% url 'user_delete' u.pk %}" class="link-action">Delete</a>
                 </td>
+                {% endif %}
             </tr>
             {% empty %}
             <tr>
@@ -35,4 +41,41 @@
     </table>
 </div>
 
+<hr style="margin: 40px 0;">
+
+<h2 class="page-title">Groups</h2>
+<a href="{% url 'group_create' %}" class="btn create-user" style="margin-bottom: 20px;">+ Create Group</a>
+
+<div class="user-table-wrapper">
+    <table class="user-table">
+        <thead>
+            <tr>
+                <th>Group Name</th>
+                <th>Members</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for group in groups %}
+            <tr>
+                <td>{{ group.name }}</td>
+                <td>
+                    {% for member in group.members.all %}
+                        {{ member.username }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                </td>
+                <td>
+                    <a href="{% url 'group_edit' group.pk %}" class="link-action">Edit</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3" style="text-align: center; padding: 20px; color: var(--text-muted);">No groups found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
 {% endblock %}
+

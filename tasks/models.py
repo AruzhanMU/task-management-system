@@ -30,13 +30,14 @@ class Task(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     deadline = models.DateTimeField()
-    assigned_to = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, related_name='tasks')
+    assigned_to = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name='tasks')
     created_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='created_tasks')
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='medium')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='new')
     attachment = models.FileField(upload_to='attachments/', blank=True, null=True)  # ✅ Добавили сюда
     created_at = models.DateTimeField(auto_now_add=True)
     reminder_sent = models.BooleanField(default=False)
+    group_assigned = models.ForeignKey('Group', on_delete=models.SET_NULL, null=True, blank=True, related_name='tasks')
 
     def __str__(self):
         return self.title
@@ -58,3 +59,11 @@ class TaskLog(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.action} on {self.task.title}"
+
+class Group(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    members = models.ManyToManyField(CustomUser, related_name='custom_groups')  # <--- изменили!
+    created_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='created_groups')
+
+    def __str__(self):
+        return self.name

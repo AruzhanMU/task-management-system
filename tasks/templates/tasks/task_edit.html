@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="fade-in">
-    <h2>Edit task</h2>
+    <h2>Edit Task</h2>
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
 
@@ -19,18 +19,25 @@
             <label>Deadline</label>
             {{ form.deadline }}
 
-            <label>Assign to</label>
+            <label>Assign to user</label>
             {{ form.assigned_to }}
+
+            <label>Or assign to group</label>
+            {{ form.group_assigned }}
 
             <label>Priority</label>
             {{ form.priority }}
 
             <label>Status</label>
             {{ form.status }}
+
+            <label>Attachment</label>
+            {{ form.attachment }}
         {% endif %}
 
         <button type="submit">Save</button>
     </form>
 </div>
 {% endblock %}
+
 
