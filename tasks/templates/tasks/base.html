@@ -20,6 +20,8 @@
 
                         {% if user.role == 'admin' %}
                             <a href="{% url 'users_list' %}">Users</a>
+                        {% elif user.role == 'manager' %}
+                            <a href="{% url 'users_list' %}">Users</a>
                         {% endif %}
 
                         <a href="{% url 'logout' %}">Logout</a>

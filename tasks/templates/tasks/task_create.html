@@ -1,3 +1,4 @@
+{# templates/tasks/task_create.html #}
 {% extends 'tasks/base.html' %}
 {% block content %}
 
@@ -6,36 +7,68 @@
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
 
+    {# Отображаем ошибки формы, если они есть (особенно важно для валидации user/group) #}
+    {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+            {% for error in form.non_field_errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+    {% if form.errors %}
+         <div class="alert alert-danger">
+             Please correct the errors below.
+         </div>
+    {% endif %}
+
+
     <label>Title</label>
     {{ form.title }}
+    {% if form.title.errors %}<div class="text-danger">{{ form.title.errors }}</div>{% endif %}
+
 
     <label>Description</label>
     {{ form.description }}
+    {% if form.description.errors %}<div class="text-danger">{{ form.description.errors }}</div>{% endif %}
+
 
     <label>Deadline</label>
     {{ form.deadline }}
+    {% if form.deadline.errors %}<div class="text-danger">{{ form.deadline.errors }}</div>{% endif %}
 
-    <label>Assign to user</label>
+
+    {# Используем поле формы для пользователя #}
+    <label>{{ form.assigned_to.label }}</label>
     {{ form.assigned_to }}
+    {% if form.assigned_to.errors %}<div class="text-danger">{{ form.assigned_to.errors }}</div>{% endif %}
 
-    <label>Or assign to group</label>
-    <select name="group">
-        <option value="">---------</option>
-        {% for group in groups %}
-            <option value="{{ group.id }}">{{ group.name }}</option>
-        {% endfor %}
-    </select>
+
+    {# Используем новое поле формы для группы #}
+    <label>{{ form.group_to_assign.label }}</label>
+    {{ form.group_to_assign }}
+    {% if form.group_to_assign.help_text %}<small class="form-text text-muted">{{ form.group_to_assign.help_text }}</small>{% endif %}
+    {% if form.group_to_assign.errors %}<div class="text-danger">{{ form.group_to_assign.errors }}</div>{% endif %}
+
+
+    {# --- Старый блок <select name="group"> ... </select> УДАЛИТЬ --- #}
+
 
     <label>Priority</label>
     {{ form.priority }}
+    {% if form.priority.errors %}<div class="text-danger">{{ form.priority.errors }}</div>{% endif %}
+
 
     <label>Status</label>
     {{ form.status }}
+    {% if form.status.errors %}<div class="text-danger">{{ form.status.errors }}</div>{% endif %}
+
 
     <label>Attachment</label>
     {{ form.attachment }}
+    {% if form.attachment.errors %}<div class="text-danger">{{ form.attachment.errors }}</div>{% endif %}
 
-    <button type="submit">Create</button>
+
+    <button type="submit" class="btn btn-primary">Create</button> {# Добавил класс btn для стиля #}
 </form>
 
 {% endblock %}

@@ -10,8 +10,9 @@ import csv
 from django.http import HttpResponse
 from weasyprint import HTML
 from django.template.loader import render_to_string
-from .calendar_service import create_calendar_event
+# from .calendar_service import create_calendar_event
 from django.contrib.auth.forms import SetPasswordForm
+from django.db import transaction # <--- Добавить импорт для транзакций
 
 def register(request):
     if request.method == 'POST':
@@ -33,29 +34,35 @@ def dashboard(request):
     status_filter = request.GET.get('status')
     priority_filter = request.GET.get('priority')
 
+    # Получаем базовый кверисет задач
+    tasks_qs = Task.objects.select_related('assigned_to', 'created_by') # Оптимизация запроса
+
     if request.user.role == 'admin':
-        tasks = Task.objects.all()
-
+        # Администратор видит все задачи
+        tasks = tasks_qs.all()
     elif request.user.role == 'manager':
-        tasks = Task.objects.filter(
-            Q(assigned_to=request.user) |
-            Q(created_by=request.user)
-        )
-
+        # Менеджер видит свои созданные задачи и задачи, назначенные ему
+        tasks = tasks_qs.filter(
+            Q(assigned_to=request.user) | Q(created_by=request.user)
+        ).distinct() # distinct на случай, если менеджер сам себе назначил
     else:  # worker
-        tasks = Task.objects.filter(
-            Q(assigned_to=request.user) |
-            Q(assigned_group__members=request.user)  # 👈 Задачи групп, в которых состоит пользователь
-        ).distinct()
+        # Исполнитель видит только задачи, назначенные ему напрямую
+        tasks = tasks_qs.filter(assigned_to=request.user)
+        # Убираем старую проверку на группу:
+        # Q(assigned_group__members=request.user) # <-- УДАЛЕНО
 
+    # Применяем фильтры по статусу и приоритету
     if status_filter:
         tasks = tasks.filter(status=status_filter)
-
     if priority_filter:
         tasks = tasks.filter(priority=priority_filter)
 
+    # Сортируем задачи, например, по дедлайну
+    tasks = tasks.order_by('deadline')
+
+    # Считаем статистику уже после фильтрации
     total = tasks.count()
-    new = tasks.filter(status='new').count()
+    new = tasks.filter(status='new').count() # Считаем от отфильтрованного queryset
     in_progress = tasks.filter(status='in_progress').count()
     done = tasks.filter(status='done').count()
 
@@ -68,47 +75,110 @@ def dashboard(request):
     })
 
 @login_required
+# Оборачиваем в транзакцию, чтобы все задачи создались или ни одна
+@transaction.atomic
 def task_create(request):
     if request.user.role not in ['manager', 'admin']:
         messages.error(request, 'You are not allowed to create tasks.')
         return redirect('dashboard')
 
     if request.method == 'POST':
+        # Передаем request.FILES для обработки загрузки файлов
         form = TaskForm(request.POST, request.FILES)
         if form.is_valid():
-            task = form.save(commit=False)
-            task.created_by = request.user
+            # Получаем данные из формы
+            title = form.cleaned_data['title']
+            description = form.cleaned_data['description']
+            deadline = form.cleaned_data['deadline']
+            priority = form.cleaned_data['priority']
+            status = form.cleaned_data['status']
+            attachment = form.cleaned_data.get('attachment') # Используем get для необязательного поля
 
-            # 👉 Добавляем назначение группы
-            group_id = request.POST.get('group')
-            if group_id:
-                from .models import Group  # если ещё не импортировал
-                try:
-                    group = Group.objects.get(id=group_id)
-                    task.group_assigned = group
-                except Group.DoesNotExist:
-                    pass  # если вдруг группу удалили
+            created_by_user = request.user
 
-            task.save()
-            form.save_m2m()
+            # Определяем, кому назначить: пользователю или группе
+            assigned_to_user = form.cleaned_data.get('assigned_to')
+            assigned_to_group = form.cleaned_data.get('group_to_assign')
 
-            try:
-                create_calendar_event(task)
-            except Exception as e:
-                print(f"Google Calendar error: {e}")
+            tasks_created_count = 0
+            created_tasks_list = [] # Список для Google Calendar
 
-            messages.success(request, 'Task created successfully.')
+            if assigned_to_user:
+                # --- Создание задачи для одного пользователя ---
+                task = Task.objects.create(
+                    title=title,
+                    description=description,
+                    deadline=deadline,
+                    priority=priority,
+                    status=status,
+                    created_by=created_by_user,
+                    assigned_to=assigned_to_user,
+                    attachment=attachment
+                )
+                # form.save_m2m() здесь не нужен, так как нет M2M полей на Task
+                tasks_created_count = 1
+                created_tasks_list.append(task)
+                log_task_action(task=task, user=request.user, action="Task created") # Логирование
+
+            elif assigned_to_group:
+                # --- Создание задач для каждого члена группы ---
+                members = assigned_to_group.members.all()
+                if not members:
+                     messages.warning(request, f"Group '{assigned_to_group.name}' has no members. No tasks were created.")
+                     # Можно вернуть форму обратно или редирект, в зависимости от желаемого поведения
+                     return render(request, 'tasks/task_create.html', {'form': form})
+
+                for member in members:
+                    task = Task.objects.create(
+                        title=title,
+                        description=description,
+                        deadline=deadline,
+                        priority=priority,
+                        status=status,
+                        created_by=created_by_user,
+                        assigned_to=member, # Назначаем конкретному участнику
+                        attachment=attachment # Переиспользуем тот же файл (если он есть)
+                        # group_assigned здесь не используется
+                    )
+                    tasks_created_count += 1
+                    created_tasks_list.append(task)
+                    log_task_action(task=task, user=request.user, action=f"Task created for group '{assigned_to_group.name}'") # Логирование
+
+            # Интеграция с Google Calendar (после создания всех задач)
+            # if created_tasks_list:
+            #     for task in created_tasks_list:
+            #         try:
+            #             # Убедитесь, что у задачи есть assigned_to перед отправкой в календарь
+            #             if task.assigned_to:
+            #                # create_calendar_event(task) # <--- Главный вызов закомментирован
+            #                pass # Добавляем pass, чтобы блок try не был пустым
+            #             else:
+            #                 print(f"Skipping calendar event for task {task.id}: no assignee.")
+            #         except Exception as e:
+            #             # Логируем ошибку, но не прерываем процесс
+            #             print(f"Google Calendar error for task {task.id}: {e}")
+            #             # Можно закомментировать и сообщение пользователю, чтобы не мешало
+            #             # messages.warning(request, f"Could not add task '{task.title}' for {task.assigned_to.username} to Google Calendar. Error: {e}")
+
+
+            if tasks_created_count > 0:
+                 messages.success(request, f'{tasks_created_count} task(s) created successfully.')
+            # Если группа была пуста, сообщение уже было добавлено выше
+
             return redirect('dashboard')
-    else:
+        else:
+            # Форма невалидна, рендерим шаблон с ошибками
+             messages.error(request, 'Please correct the errors below.')
+
+    else: # GET запрос
         form = TaskForm()
 
-    # 🛠 Передаём список всех групп в форму
-    from .models import Group
-    groups = Group.objects.all()
+    # В GET запросе groups больше не нужны, форма сама их подгружает
+    # groups = Group.objects.all() # <--- Удалить эту строку
 
     return render(request, 'tasks/task_create.html', {
         'form': form,
-        'groups': groups,
+        # 'groups': groups, # <--- Удалить эту строку
     })
 
 @login_required

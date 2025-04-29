@@ -34,10 +34,10 @@ class Task(models.Model):
     created_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='created_tasks')
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='medium')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='new')
-    attachment = models.FileField(upload_to='attachments/', blank=True, null=True)  # ✅ Добавили сюда
+    attachment = models.FileField(upload_to='attachments/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     reminder_sent = models.BooleanField(default=False)
-    group_assigned = models.ForeignKey('Group', on_delete=models.SET_NULL, null=True, blank=True, related_name='tasks')
+    # group_assigned = models.ForeignKey('Group', on_delete=models.SET_NULL, null=True, blank=True, related_name='tasks')
 
     def __str__(self):
         return self.title
